@@ -1,0 +1,42 @@
+# === Python Environment ===
+venv/
+.venv/
+env/
+ENV/
+pyvenv.cfg
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# === Scrapy Specific ===
+.scrapy/
+crawls/
+*.log
+
+# === Local Data & Database Storage ===
+# Ignore local database files to prevent committing sensitive or raw datasets
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore required raw output data formats (JSON, CSV, XML)
+# They should be generated dynamically, not stored in git
+books.json
+books.csv
+books.xml
+*.json
+*.csv
+*.xml
+
+# === IDE & OS Files ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# === Deployment & Containerization ===
+# Ignore local build artifacts while keeping Dockerfile and scrapyd.conf
+.dockerignore
+build/
+project.egg-info/
