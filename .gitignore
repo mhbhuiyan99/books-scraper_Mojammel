@@ -22,9 +22,9 @@ crawls/
 
 # Ignore required raw output data formats (JSON, CSV, XML)
 # They should be generated dynamically, not stored in git
-books.json
-books.csv
-books.xml
+output.json
+output.csv
+output.xml
 *.json
 *.csv
 *.xml

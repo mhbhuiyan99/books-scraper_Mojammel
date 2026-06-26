@@ -1,4 +1,5 @@
 import scrapy
+import random
 
 class BooksSpider(scrapy.Spider):
     # Unique identifier for this scraper
@@ -7,35 +8,57 @@ class BooksSpider(scrapy.Spider):
     # Where to start crawling
     start_urls = ["https://books.toscrape.com/index.html"]
 
-    # Parse method: called for every downloaded page
-    # Website returns HTML, response contains the page
+
     def parse(self, response):
-        # --- CATEGORY EXTRACTION (Homepage) ---
+        """Parse the homepage - discover all categories"""
 
-        # Get all category links from sidebar
-        category_links = response.css("div.side_categories ul.nav-list li a::attr(href)").getall()
+        # Get category links
+        categories = response.css("div.side_categories ul.nav-list li ul li a")
+
+        for category in categories:
+            category_name = category.css("::text").get().strip()
+            category_url = category.css("::attr(href)").get()
+
+            # Follow the category link
+            yield response.follow(
+                category_url,
+                callback=self.parse_category,
+                meta={  # data pass to next method
+                    "category": category_name,
+                }
+            )
+
+    def parse_category(self, response):
+        """Parse a category page - collect all books, pick 5 random"""
+
+        category_name = response.meta["category"] #  Data passed from previous method
+
+        # Get all books links on this category page
+        book_links = response.css("article.product_pod h3 a::attr(href)").getall()
+
+        # Random select exactly 5 books
+        selected = random.sample(book_links, min(5, len(book_links)))
+
+        for book_url in selected:
+            # Follow each selected book's link
+            yield response.follow(
+                book_url,
+                callback=self.parse_book,
+                meta={
+                    "category": category_name
+                }
+            )
+
+    def parse_book(self, response):
+        """Parse a single book's detail page"""
         
-        # Get category names
-        category_names = response.css("div.side_categories ul.nav-list a::text").getall()
+        category = response.meta["category"]
 
-
-        # --- BOOK EXTRACTION (Category page) ---
-
-        # Get all book containers
-        books = response.css("article.product_pod")
-
-        for book in books:
-            # Extract title from <a>
-            title = book.css("h3 a::attr(title)").get()
-
-            # Extract price
-            price = book.css("p.price_color::text").get()
-
-            # Extract availability
-            avilabilty = book.css("p.availability::text").get()
-
-            yield {
-                "title": title,
-                "price": price,
-                "availability": availability,
-            }
+        yield {
+            "title": response.css("div.product_main h1::text").get(),
+            "price": response.css("p.price_color::text").get(),
+            "availability": response.css("p.availability::text").get().strip(),
+            "product_url": response.url,
+            "image_url": response.css("div.item.active img::attr(src)").get(),
+            "category": category,
+        }
