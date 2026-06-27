@@ -1,6 +1,6 @@
 import scrapy
 import random
-from books_scraper.items import BookItem
+from books_scraper.items import BookItem, BookItemLoader
 
 class BooksSpider(scrapy.Spider):
     # Unique identifier for this scraper
@@ -53,12 +53,16 @@ class BooksSpider(scrapy.Spider):
     def parse_book(self, response):
         """Parse a single book's detail page"""
         
-        # Create an instance of item
-        book = BookItem()
+        # Use ItemLoader for clean data extraction
+        loader = BookItemLoader(item=BookItem(), response=response)
 
-        book["title"] = response.css("div.product_main h1::text").get(),
-        book["price"] = response.css("p.price_color::text").get(),
-        book["availability"] = response.css("p.availability::text").get().strip(),
-        book["product_url"] = response.url,
-        book["image_url"] = response.css("div.item.active img::attr(src)").get(),
-        book["category"] = response.meta["category"],
+        # Add data using CSS selectors - cleaning happens automatically
+        loader.add.css("title", "div.product_main h1::text")
+        loader.add.css("price", "p.price_color::text")
+        loader.add.css("availability","p.availability::text")
+        loader.add_value("product_url", response.url)
+        loader.add.css("image_url","div.item.active img::attr(src)")
+        loader.add_value("category", response.meta["category"])
+
+        # Load the item - all processors are applied
+        yield loader.load_item()
