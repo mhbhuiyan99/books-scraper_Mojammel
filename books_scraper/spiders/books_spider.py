@@ -1,5 +1,6 @@
 import scrapy
 import random
+from books_scraper.items import BookItem
 
 class BooksSpider(scrapy.Spider):
     # Unique identifier for this scraper
@@ -52,13 +53,12 @@ class BooksSpider(scrapy.Spider):
     def parse_book(self, response):
         """Parse a single book's detail page"""
         
-        category = response.meta["category"]
+        # Create an instance of item
+        book = BookItem()
 
-        yield {
-            "title": response.css("div.product_main h1::text").get(),
-            "price": response.css("p.price_color::text").get(),
-            "availability": response.css("p.availability::text").get().strip(),
-            "product_url": response.url,
-            "image_url": response.css("div.item.active img::attr(src)").get(),
-            "category": category,
-        }
+        book["title"] = response.css("div.product_main h1::text").get(),
+        book["price"] = response.css("p.price_color::text").get(),
+        book["availability"] = response.css("p.availability::text").get().strip(),
+        book["product_url"] = response.url,
+        book["image_url"] = response.css("div.item.active img::attr(src)").get(),
+        book["category"] = response.meta["category"],
