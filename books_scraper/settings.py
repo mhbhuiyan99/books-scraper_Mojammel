@@ -18,7 +18,7 @@ ITEM_PIPELINES = {
 
 FEEDS = {
     # JSON format
-    "books.json": {
+    "output/books.json": {
         "format": "json",
         "encoding": "utf8",
         "indent": 4,          
@@ -26,14 +26,14 @@ FEEDS = {
     },
     
     # CSV format
-    "books.csv": {
+    "output/books.csv": {
         "format": "csv",
         "encoding": "utf8",
         "overwrite": True,
     },
     
     # XML format
-    "books.xml": {
+    "output/books.xml": {
         "format": "xml",
         "encoding": "utf8",
         "overwrite": True,

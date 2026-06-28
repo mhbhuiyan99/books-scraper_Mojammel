@@ -12,17 +12,19 @@ __pycache__/
 # === Scrapy Specific ===
 .scrapy/
 crawls/
+logs/
 *.log
 
 # === Local Data & Database Storage ===
 # Ignore local database files to prevent committing sensitive or raw datasets
+dbs/
 *.db
 *.sqlite
 *.sqlite3
 
 # Ignore required raw output data formats (JSON, CSV, XML)
 # They should be generated dynamically, not stored in git
-
+output/
 *.json
 *.csv
 *.xml
@@ -35,6 +37,7 @@ Thumbs.db
 
 # === Deployment & Containerization ===
 # Ignore local build artifacts while keeping Dockerfile and scrapyd.conf
-.dockerignore
 build/
+eggs/
+*.egg-info/
 project.egg-info/

@@ -1,0 +1,14 @@
+# .dockerignore
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.git/
+.gitignore
+books.json
+books.csv
+books.xml
+books.db
+*.log
