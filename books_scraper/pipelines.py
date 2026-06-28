@@ -1,4 +1,6 @@
 import logging
+import sqlite3
+from books_scraper.items import BookItem
 
 logger = logging.getLogger(__name__)
 
@@ -61,3 +63,87 @@ class BookCleaningPipeline:
         
         # Check if "in stock" appears anywhere in the text
         return "in stock" in availability_str.lower()
+
+
+class DatabasePipeline:
+    """
+    Pipeline for storing cleaned items in SQLite database.
+    Runs after the cleaning pipeline
+    """
+
+    def __init__(self, db_path="books.db"):
+        """
+        Initialize the pipeline.
+        This is called when the spider starts.
+        """
+        self.db_path = db_path
+        self.conn = None
+        self.cursor = None
+    
+    def open_spider(self, spider):
+        """
+        Called when the spider opens.
+        Create the database connection and table.
+        """
+
+        spider.logger.info("Opening database connection...")
+
+        self.conn = sqlite3.connect(self.db_path)
+        self.cursor = self.conn.cursor()
+
+        self._create_table()
+
+        spider.logger.info(f"Database '{self.db_path}' ready.")
+
+    def _create_table(self):
+        """
+        Create the books table if it doesn't exist.
+        """
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                price REAL,
+                availability INTEGER,
+                product_url TEXT,
+                image_url TEXT,
+                category TEXT
+            )
+        """)
+        self.conn.commit()
+
+    def process_item(self, item, spider):
+        """
+        Insert a book into the database.
+        Called for EVERY item that passes through the pipeline.
+        """
+        try:
+            self.cursor.execute("""
+                INSERT INTO books (title, price, availability, product_url, image_url, category)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                item.get("title", ""),
+                item.get("price", 0.0),
+                1 if item.get("availability") else 0,  # Boolean → Integer
+                item.get("product_url", ""),
+                item.get("image_url", ""),
+                item.get("category", ""),
+            ))
+            self.conn.commit()
+            
+            spider.logger.info(f"Stored in DB: {item.get('title')}")
+            
+        except sqlite3.Error as e:
+            spider.logger.error(f"Database error: {e}")
+        
+        return item 
+    
+    def close_spider(self, spider):
+        """
+        Called when the spider closes.
+        Close the database connection.
+        """
+        spider.logger.info("Closing database connection...")
+        
+        if self.conn:
+            self.conn.close()
