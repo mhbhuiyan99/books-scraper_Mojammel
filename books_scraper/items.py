@@ -1,6 +1,6 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import TakeFirst, MapCompose, Join
+from itemloaders.processors import TakeFirst, MapCompose, Join
 
 # Input Processors
 def strip_whitespace(value):
