@@ -9,7 +9,8 @@ ROBOTSTXT_OBEY = True
 
 # Configure pipelines
 ITEM_PIPELINES = {
-    "books_scraper.pipelines.BookCleaningPipeline": 100,
+    "books_scraper.pipelines.BookCleaningPipeline": 100,   # Clean first
+    "books_scraper.pipelines.DatabasePipeline": 200,        # Then store
 }
 
 # --- FEED EXPORTS ---
