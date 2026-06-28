@@ -18,7 +18,6 @@ A production-ready Scrapy application for scraping book data from [Books to Scra
 - [Architecture Diagram](#architecture-diagram)
 - [Folder Structure](#folder-structure)
 - [Design Decisions](#design-decisions)
-- [Known Limitations](#known-limitations)
 
 ---
 
