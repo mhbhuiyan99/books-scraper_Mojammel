@@ -62,13 +62,14 @@ class BooksSpider(scrapy.Spider):
 
         # Get all books links on this category page
         book_links = response.css("article.product_pod h3 a::attr(href)").getall()
+        no_of_selected_books = min(5, len(book_links))
 
         self.logger.info(
-            f"Category '{category_name}': {len(book_links)} books found, " f"selecting 5"
+            f"Category '{category_name}': {len(book_links)} books found, " f"selecting '{no_of_selected_books}'"
         )
 
         # Random select exactly 5 books
-        selected_books = random.sample(book_links, min(5, len(book_links)))
+        selected_books = random.sample(book_links, no_of_selected_books)
 
         for book_url in selected_books:
             # Follow each selected book's link
@@ -88,8 +89,15 @@ class BooksSpider(scrapy.Spider):
         # Use ItemLoader for clean data extraction
         loader = BookItemLoader(item=BookItem(), response=response)
 
-        # Add data using CSS selectors - cleaning happens automatically
-        loader.add_css("title", "div.product_main h1::text")
+        # Extract title first to validate
+        title = response.css("div.product_main h1::text").get()
+        
+        # VALIDATION: Skip if title is missing
+        if not title or not title.strip():
+            self.logger.error(f"Missing title at {response.url} — skipping")
+            return  # Don't yield anything, spider continues
+
+        # Add all fields to loader
         loader.add_css("price", "p.price_color::text")
         loader.add_css("availability","p.instock.availability::text")
         loader.add_value("product_url", response.url)
