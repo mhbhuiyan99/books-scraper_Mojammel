@@ -21,6 +21,18 @@ ADDONS = {}
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+# Configure pipelines
+ITEM_PIPELINES = {
+    "books_scraper.pipelines.BookCleaningPipeline": 100,
+}
+
+# Feed exports (JSON, CSV, XML)
+FEEDS = {
+    "books.json": {"format": "json"},
+    "books.csv": {"format": "csv"},
+    "books.xml": {"format": "xml"},
+}
+
 # Concurrency and throttling settings
 #CONCURRENT_REQUESTS = 16
 CONCURRENT_REQUESTS_PER_DOMAIN = 1
