@@ -18,6 +18,7 @@ A production-ready Scrapy application for scraping book data from [Books to Scra
 - [Architecture Diagram](#architecture-diagram)
 - [Folder Structure](#folder-structure)
 - [Design Decisions](#design-decisions)
+- [Known Limitations](#known-limitations)
 
 ---
 
@@ -471,3 +472,18 @@ books-scraper_Mojammel/
 | **Return `None` instead of `DropItem`** | Avoids import issues across different Scrapy versions while achieving the same effect |
 
 ---
+
+## Known Limitations
+
+| Limitation | Description | Workaround |
+|------------|-------------|------------|
+| **Website availability** | Target site may be down or changed | Assignment uses a stable demo site; no mitigation needed |
+| **No retry logic** | Network failures cause spider to skip items | Scrapy has built-in retry middleware (enabled by default) |
+| **Single-threaded per domain** | Scrapy respects `DOWNLOAD_DELAY` | Default concurrent requests are limited by `CONCURRENT_REQUESTS_PER_DOMAIN` |
+| **Docker output persistence** | Output files exist only inside container unless volume is mounted | Use `docker run -v` flag to mount host directory |
+| **Scrapyd runs locally** | Default Scrapyd deployment is local only | For production, deploy Scrapyd to a remote server |
+| **No authentication** | Target site requires no login | Not applicable for this assignment |
+| **Static website only** | JavaScript-rendered sites are not supported | This target site is static HTML; no JS execution needed |
+
+
+
