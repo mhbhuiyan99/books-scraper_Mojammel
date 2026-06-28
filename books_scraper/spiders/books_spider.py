@@ -5,7 +5,7 @@ from books_scraper.items import BookItem, BookItemLoader
 class BooksSpider(scrapy.Spider):
     """
     Enterprise spider that:
-        1. Discover all categories dynamically from homepage
+        1. Discovering all categories dynamically from homepage
         2. Randomly selected 5 categories
         3. From each, randomly selects 5 books
         4. Extracts all required fields from each book's detail page
@@ -20,7 +20,7 @@ class BooksSpider(scrapy.Spider):
 
     def parse(self, response):
         """
-        Parse the homepage - discover all categories, then reandomly select 5
+        Parse the homepage - discover all categories, then randomly select 5
 
         This method runs only once - for the start_url (homepage)
         """
@@ -83,19 +83,19 @@ class BooksSpider(scrapy.Spider):
     def parse_book(self, response):
         """Parse a single book's detail page"""
 
-        category_name = response.meta["category_name"]
+        category_name = response.meta["category"]
         
         # Use ItemLoader for clean data extraction
         loader = BookItemLoader(item=BookItem(), response=response)
 
         # Add data using CSS selectors - cleaning happens automatically
-        loader.add.css("title", "div.product_main h1::text")
-        loader.add.css("price", "p.price_color::text")
-        loader.add.css("availability","p.instock.availability::text")
+        loader.add_css("title", "div.product_main h1::text")
+        loader.add_css("price", "p.price_color::text")
+        loader.add_css("availability","p.instock.availability::text")
         loader.add_value("product_url", response.url)
         
         # Image URL needs the base URL prepended
-        image_src = response.css("div.item.active img:attr(src)").get() #  return[example]: ../../../its-only-the-himalayas_981/img.jpg
+        image_src = response.css("div.item.active img::attr(src)").get() #  return[example]: ../../../its-only-the-himalayas_981/img.jpg
         if image_src:
             # Convert relative URL to absolute
             image_url = response.urljoin(image_src) #  [example] https://books.toscrape.com/catalogue/its-only-the-himalayas_981/img.jpg
