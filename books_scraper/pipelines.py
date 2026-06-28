@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 class BookCleaningPipeline:
     """
-    Pipleline for cleaning and normalizing scraped book daa
+    Pipeline for cleaning and normalizing scraped book data
     Processing steps:
         1. Strip whitespace from all text fields
         2. Remove currency symbol from price and convert to float
@@ -19,6 +19,8 @@ class BookCleaningPipeline:
         # Strip whitespace
         item["title"] = self._strip_field(item.get("title"))
         item["category"] = self._strip_field(item.get("category"))
+        item["product_url"] = self._strip_field(item.get("product_url"))
+        item["image_url"] = self._strip_field(item.get("image_url"))
 
         # Clean price (remove £, convert to float)
         item["price"] = self._clean_price(item.get("price"))
