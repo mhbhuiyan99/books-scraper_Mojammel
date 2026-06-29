@@ -61,7 +61,7 @@ class BooksSpider(scrapy.Spider):
         category_name = response.meta["category_name"] #  Data passed from previous method
 
         # Get all books links on this category page
-        book_links = response.css("article.product_pod h3 a::attr(href)").getall()
+        book_links = response.xpath("//article[@class='product_pod']/h3/a/@href").getall()
         no_of_selected_books = min(5, len(book_links))
 
         self.logger.info(
@@ -90,7 +90,7 @@ class BooksSpider(scrapy.Spider):
         loader = BookItemLoader(item=BookItem(), response=response)
 
         # Extract title first to validate
-        title = response.css("div.product_main h1::text").get()
+        title = response.xpath("//div[contains(@class, 'product_main')]/h1/text()").get()
         
         # VALIDATION: Skip if title is missing
         if not title or not title.strip():
